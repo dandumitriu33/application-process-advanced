@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Codecool.ApplicationProcess.Entities;
 
 namespace Codecool.ApplicationProcess.Data
@@ -31,35 +33,77 @@ namespace Codecool.ApplicationProcess.Data
         public int AmountOfApplicationAfter(DateTime date)
         {
             // Your implementation goes here.
-            throw new NotImplementedException();
+            var numberOfApplications = _applications.Count(s => s.ApplicationDate > date);
+            Console.WriteLine(numberOfApplications);
+            return numberOfApplications;
         }
 
         /// <inheritdoc/>
         public IEnumerable<Mentor> GetAllMentorFrom(City city)
         {
             // Your implementation goes here.
-            throw new NotImplementedException();
+            var mentorsFromSelectedCity = _mentors.Where(s => s.City == city);
+            return mentorsFromSelectedCity;
         }
 
         /// <inheritdoc/>
-        public IEnumerable<Mentor> GetAllMentorWhomFavoriteLanguage(string language)
+        public IEnumerable<Mentor> GetAllMentorWhomFavoriteLanguage(Language selectedLanguage)
         {
             // Your implementation goes here.
-            throw new NotImplementedException();
+            if (selectedLanguage.ToString() == "CSharp")
+            {
+                var mentorsWithCSharp = _mentors.Where(s => s.ProgrammingLanguage == "C#");
+                return mentorsWithCSharp;
+            }
+
+            var mentorsWithLanguage = _mentors.Where(s => s.ProgrammingLanguage == selectedLanguage.ToString());
+            return mentorsWithLanguage;
         }
 
         /// <inheritdoc/>
         public IEnumerable<Applicant> GetApplicantsOf(string contactMentorName)
         {
             // Your implementation goes here.
-            throw new NotImplementedException();
+            //var applicants = _applicants.Join(
+            //                    _applications,
+            //                    applicant => applicant.Id,
+            //                    application => application.Applicant.Id,
+            //                    (applicant, application) => new
+            //                    {
+            //                        ApplicantId = applicant.Id,
+            //                        MentorNickname = application.Mentor.Nickname,
+            //                        MentorName = application.Mentor.FirstName + " " + application.Mentor.LastName,
+            //                    });
+            //Console.WriteLine(applicants.ToString());
+            //return _applicants;
+            var groupedApplicationsByMentor = _applications.GroupBy(a => a.Mentor.Nickname);
+            var applicants = new List<Applicant>();
+            foreach (var mentorGroup in groupedApplicationsByMentor)
+            {
+                if (mentorGroup.Key == contactMentorName)
+                {
+                    foreach (var application in mentorGroup)
+                    {
+                        applicants.Add(application.Applicant);
+                    }
+                }
+            }
+
+            return applicants;
         }
 
         /// <inheritdoc/>
         public IEnumerable<string> GetAppliedStudentEmailList()
         {
             // Your implementation goes here.
-            throw new NotImplementedException();
+            List<string> emails = new List<string>();
+            var appliedApplicants = _applicants.Where(a => a.Status == ApplicationStatus.Applied);
+            foreach (var applicant in appliedApplicants)
+            {
+                emails.Add(applicant.Email);
+            }
+
+            return emails;
         }
 
         /// <summary>
@@ -84,6 +128,7 @@ namespace Codecool.ApplicationProcess.Data
             };
             var belian = new Mentor("Belián", "Radosza")
             {
+                Nickname = "Belian",
                 City = City.Budapest,
                 PhoneNumber = "123498765",
                 ProgrammingLanguage = "C#",
@@ -116,6 +161,13 @@ namespace Codecool.ApplicationProcess.Data
                 PhoneNumber = "453454321",
                 ProgrammingLanguage = "Javascript",
             };
+            var gigi = new Mentor("George", "Georgescu")
+            {
+                Nickname = "Gigi",
+                City = City.Bucharest,
+                PhoneNumber = "453454321",
+                ProgrammingLanguage = "Javascript",
+            };
             _mentors.Add(atesz);
             _mentors.Add(matyi);
             _mentors.Add(belian);
@@ -123,6 +175,7 @@ namespace Codecool.ApplicationProcess.Data
             _mentors.Add(pal);
             _mentors.Add(robi);
             _mentors.Add(mati);
+            _mentors.Add(gigi);
             #endregion
 
             #region Seed Schools

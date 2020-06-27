@@ -21,7 +21,7 @@ namespace Codecool.ApplicationProcess.Data
         /// </summary>
         /// <param name="language">Programming language.</param>
         /// <returns><see cref="IEnumerable{Mentor}"/> collection of mentors.</returns>
-        IEnumerable<Mentor> GetAllMentorWhomFavoriteLanguage(string language);
+        IEnumerable<Mentor> GetAllMentorWhomFavoriteLanguage(Language language);
 
         /// <summary>
         /// Gets all <see cref="Applicant"/> who applied and her contact mentor is equal to the given one.
